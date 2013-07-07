@@ -181,6 +181,24 @@ public class ContextualUndoListViewTouchListener implements View.OnTouchListener
                 break;
             }
 
+            case MotionEvent.ACTION_CANCEL: {
+                // Reset the state on a cancelled event
+                if (mDownView != null) {
+                    // cancel
+                    animate(mDownView)
+                            .translationX(0)
+                            .alpha(1)
+                            .setDuration(mAnimationTime)
+                            .setListener(null);
+                }
+                mVelocityTracker = null;
+                mDownX = 0;
+                mDownView = null;
+                mDownPosition = ListView.INVALID_POSITION;
+                mSwiping = false;
+                break;
+            }
+
             case MotionEvent.ACTION_MOVE: {
                 if (mVelocityTracker == null || mPaused) {
                     break;
