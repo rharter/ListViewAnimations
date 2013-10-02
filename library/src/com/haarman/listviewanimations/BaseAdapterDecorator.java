@@ -15,11 +15,16 @@
  */
 package com.haarman.listviewanimations;
 
+import com.haarman.listviewanimations.view.DynamicListView;
 import android.database.DataSetObserver;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.SectionIndexer;
+
+import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
+import com.haarman.listviewanimations.view.DynamicListView.Swappable;
 
 /**
  * A decorator class that enables decoration of an instance of the BaseAdapter
@@ -28,40 +33,25 @@ import android.widget.BaseAdapter;
  * Classes extending this class can override methods and provide extra
  * functionality before or after calling the super method.
  */
-public abstract class BaseAdapterDecorator extends BaseAdapter {
+public abstract class BaseAdapterDecorator extends BaseAdapter implements SectionIndexer, StickyListHeadersAdapter, DynamicListView.Swappable {
 
 	protected final BaseAdapter mDecoratedBaseAdapter;
 
 	private AbsListView mListView;
 
+	private boolean mIsParentHorizontalScrollContainer;
+
 	public BaseAdapterDecorator(BaseAdapter baseAdapter) {
 		mDecoratedBaseAdapter = baseAdapter;
 	}
 
-    @Deprecated
-    /**
-     * @deprecated use setAbsListView(AbsListView) instead.
-     */
-	public void setListView(AbsListView listView) {
+	public void setAbsListView(AbsListView listView) {
 		mListView = listView;
 
 		if (mDecoratedBaseAdapter instanceof BaseAdapterDecorator) {
-			((BaseAdapterDecorator) mDecoratedBaseAdapter).setListView(listView);
+			((BaseAdapterDecorator) mDecoratedBaseAdapter).setAbsListView(listView);
 		}
 	}
-
-    public void setAbsListView(AbsListView listView){
-        mListView = listView;
-
-        if (mDecoratedBaseAdapter instanceof BaseAdapterDecorator) {
-            ((BaseAdapterDecorator) mDecoratedBaseAdapter).setAbsListView(listView);
-        }
-    }
-
-    @Deprecated
-    public AbsListView getListView(){
-        return mListView;
-    }
 
 	public AbsListView getAbsListView() {
 		return mListView;
@@ -142,7 +132,62 @@ public abstract class BaseAdapterDecorator extends BaseAdapter {
 		mDecoratedBaseAdapter.unregisterDataSetObserver(observer);
 	}
 
+	@Override
+	public int getPositionForSection(int section) {
+		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
+			return ((SectionIndexer) mDecoratedBaseAdapter).getPositionForSection(section);
+		}
+		return 0;
+	}
+
+	@Override
+	public int getSectionForPosition(int position) {
+		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
+			return ((SectionIndexer) mDecoratedBaseAdapter).getSectionForPosition(position);
+		}
+		return 0;
+	}
+
+	@Override
+	public Object[] getSections() {
+		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
+			return ((SectionIndexer) mDecoratedBaseAdapter).getSections();
+		}
+		return null;
+	}
+
+	@Override
+	public long getHeaderId(int position) {
+		if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
+			return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderId(position);
+		}
+		return 0;
+	}
+
+	@Override
+	public View getHeaderView(int position, View convertView, ViewGroup parent) {
+		if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
+			return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderView(position, convertView, parent);
+		}
+		return null;
+	}
+
 	public BaseAdapter getDecoratedBaseAdapter() {
 		return mDecoratedBaseAdapter;
+	}
+
+	@Override
+	public void swapItems(int positionOne, int positionTwo) {
+		if (mDecoratedBaseAdapter instanceof Swappable) {
+			((Swappable) mDecoratedBaseAdapter).swapItems(positionOne, positionTwo);
+		}
+	}
+
+	public void setIsParentHorizontalScrollContainer(boolean isParentHorizontalScrollContainer) {
+		mIsParentHorizontalScrollContainer = isParentHorizontalScrollContainer;
+	}
+
+	public boolean isParentHorizontalScrollContainer() {
+		return mIsParentHorizontalScrollContainer;
 	}
 }
