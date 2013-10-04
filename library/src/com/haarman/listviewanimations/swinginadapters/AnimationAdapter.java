@@ -132,23 +132,6 @@ public abstract class AnimationAdapter extends BaseAdapterDecorator {
 		return itemView;
 	}
 
-	@Override
-	public View getHeaderView(int position, View convertView, ViewGroup parent) {
-		boolean alreadyStarted = false;
-
-		if (!mHasParentAnimationAdapter && convertView != null) {
-			alreadyStarted = cancelExistingAnimation(position, convertView);
-		}
-
-		View itemView = super.getHeaderView(position, convertView, parent);
-
-		if (!mHasParentAnimationAdapter && !alreadyStarted) {
-			animateHeaderViewIfNecessary(position, itemView, parent);
-		}
-
-		return itemView;
-	}
-
 	private boolean cancelExistingAnimation(int position, View convertView) {
 		boolean alreadyStarted = false;
 

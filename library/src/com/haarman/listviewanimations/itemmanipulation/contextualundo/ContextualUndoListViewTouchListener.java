@@ -72,7 +72,7 @@ public class ContextualUndoListViewTouchListener implements View.OnTouchListener
 	public ContextualUndoListViewTouchListener(AbsListView listView, Callback callback) {
 		ViewConfiguration vc = ViewConfiguration.get(listView.getContext());
 		mSlop = vc.getScaledTouchSlop();
-		mMinFlingVelocity = vc.getScaledMinimumFlingVelocity();
+		mMinFlingVelocity = vc.getScaledMinimumFlingVelocity() * 16;
 		mMaxFlingVelocity = vc.getScaledMaximumFlingVelocity();
 		mAnimationTime = listView.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
 		mListView = listView;
@@ -204,6 +204,7 @@ public class ContextualUndoListViewTouchListener implements View.OnTouchListener
 				MotionEvent cancelEvent = MotionEvent.obtain(motionEvent);
 				cancelEvent.setAction(MotionEvent.ACTION_CANCEL | (motionEvent.getActionIndex() << MotionEvent.ACTION_POINTER_INDEX_SHIFT));
 				mListView.onTouchEvent(cancelEvent);
+				cancelEvent.recycle();
 			}
 
 			if (mSwiping) {

@@ -21,9 +21,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
-import android.widget.SectionIndexer;
 
-import com.emilsjolander.components.stickylistheaders.StickyListHeadersAdapter;
 import com.haarman.listviewanimations.view.DynamicListView.Swappable;
 
 /**
@@ -33,7 +31,7 @@ import com.haarman.listviewanimations.view.DynamicListView.Swappable;
  * Classes extending this class can override methods and provide extra
  * functionality before or after calling the super method.
  */
-public abstract class BaseAdapterDecorator extends BaseAdapter implements SectionIndexer, StickyListHeadersAdapter, DynamicListView.Swappable {
+public abstract class BaseAdapterDecorator extends BaseAdapter implements DynamicListView.Swappable {
 
 	protected final BaseAdapter mDecoratedBaseAdapter;
 
@@ -130,46 +128,6 @@ public abstract class BaseAdapterDecorator extends BaseAdapter implements Sectio
 	@Override
 	public void unregisterDataSetObserver(DataSetObserver observer) {
 		mDecoratedBaseAdapter.unregisterDataSetObserver(observer);
-	}
-
-	@Override
-	public int getPositionForSection(int section) {
-		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
-			return ((SectionIndexer) mDecoratedBaseAdapter).getPositionForSection(section);
-		}
-		return 0;
-	}
-
-	@Override
-	public int getSectionForPosition(int position) {
-		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
-			return ((SectionIndexer) mDecoratedBaseAdapter).getSectionForPosition(position);
-		}
-		return 0;
-	}
-
-	@Override
-	public Object[] getSections() {
-		if (mDecoratedBaseAdapter instanceof SectionIndexer) {
-			return ((SectionIndexer) mDecoratedBaseAdapter).getSections();
-		}
-		return null;
-	}
-
-	@Override
-	public long getHeaderId(int position) {
-		if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
-			return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderId(position);
-		}
-		return 0;
-	}
-
-	@Override
-	public View getHeaderView(int position, View convertView, ViewGroup parent) {
-		if (mDecoratedBaseAdapter instanceof StickyListHeadersAdapter) {
-			return ((StickyListHeadersAdapter) mDecoratedBaseAdapter).getHeaderView(position, convertView, parent);
-		}
-		return null;
 	}
 
 	public BaseAdapter getDecoratedBaseAdapter() {
