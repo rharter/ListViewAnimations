@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.SectionIndexer;
 
 import com.haarman.listviewanimations.view.DynamicListView;
 import com.haarman.listviewanimations.view.DynamicListView.Swappable;
