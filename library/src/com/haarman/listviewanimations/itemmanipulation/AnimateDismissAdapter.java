@@ -24,42 +24,51 @@ import java.util.List;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 
 import com.haarman.listviewanimations.BaseAdapterDecorator;
 import com.nineoldandroids.animation.Animator;
-import com.nineoldandroids.animation.Animator.AnimatorListener;
+import com.nineoldandroids.animation.AnimatorListenerAdapter;
 import com.nineoldandroids.animation.AnimatorSet;
 import com.nineoldandroids.animation.ValueAnimator;
 import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
 /**
- * A BaseAdapterDecorator class that provides animations to the removal of items
- * in the given BaseAdapter.
+ * A {@link BaseAdapterDecorator} class that provides animations to the removal
+ * of items in the given {@link BaseAdapter}.
  */
 public class AnimateDismissAdapter<T> extends BaseAdapterDecorator {
 
 	private OnDismissCallback mCallback;
 
 	/**
-	 * Create a new AnimateDismissAdapter based on the given ArrayAdapter.
+	 * Create a new AnimateDismissAdapter based on the given {@link BaseAdapter}
+	 * .
 	 * 
 	 * @param callback
-	 *            The callback to trigger when the user has indicated that she
-	 *            would like to dismiss one or more list items.
+	 *            The {@link OnDismissCallback} to trigger when the user has
+	 *            indicated that she would like to dismiss one or more list
+	 *            items.
 	 */
 	public AnimateDismissAdapter(BaseAdapter baseAdapter, OnDismissCallback callback) {
 		super(baseAdapter);
 		mCallback = callback;
 	}
 
-	public void animateDismiss(int index) {
-		animateDismiss(Arrays.asList(index));
+	/**
+	 * Animate dismissal of the item at given position.
+	 */
+	public void animateDismiss(int position) {
+		animateDismiss(Arrays.asList(position));
 	}
 
+	/**
+	 * Animate dismissal of the items at given positions.
+	 */
 	public void animateDismiss(Collection<Integer> positions) {
 		final List<Integer> positionsCopy = new ArrayList<Integer>(positions);
-		if(getAbsListView() == null) {
-			throw new IllegalStateException("Call setListView() on this AnimateDismissAdapter before calling setAdapter()!");
+		if (getAbsListView() == null) {
+			throw new IllegalStateException("Call setAbsListView() on this AnimateDismissAdapter before calling setAdapter()!");
 		}
 
 		List<View> views = getVisibleViewsForPositions(positionsCopy);
@@ -78,23 +87,11 @@ public class AnimateDismissAdapter<T> extends BaseAdapterDecorator {
 			}
 
 			animatorSet.playTogether(animatorsArray);
-			animatorSet.addListener(new AnimatorListener() {
+			animatorSet.addListener(new AnimatorListenerAdapter() {
 
 				@Override
-				public void onAnimationStart(Animator arg0) {
-				}
-
-				@Override
-				public void onAnimationRepeat(Animator arg0) {
-				}
-
-				@Override
-				public void onAnimationEnd(Animator arg0) {
+				public void onAnimationEnd(Animator animator) {
 					invokeCallback(positionsCopy);
-				}
-
-				@Override
-				public void onAnimationCancel(Animator arg0) {
 				}
 			});
 			animatorSet.start();
@@ -106,9 +103,15 @@ public class AnimateDismissAdapter<T> extends BaseAdapterDecorator {
 	private void invokeCallback(Collection<Integer> positions) {
 		ArrayList<Integer> positionsList = new ArrayList<Integer>(positions);
 		Collections.sort(positionsList);
+
+		int nrHeaders = 0;
+		if (getAbsListView() instanceof ListView) {
+			nrHeaders = ((ListView) getAbsListView()).getHeaderViewsCount();
+		}
+
 		int[] dismissPositions = new int[positionsList.size()];
 		for (int i = 0; i < positionsList.size(); i++) {
-			dismissPositions[i] = positionsList.get(positionsList.size() - 1 - i);
+			dismissPositions[i] = positionsList.get(positionsList.size() - 1 - i - nrHeaders);
 		}
 		mCallback.onDismiss(getAbsListView(), dismissPositions);
 	}
@@ -129,24 +132,12 @@ public class AnimateDismissAdapter<T> extends BaseAdapterDecorator {
 		final int originalHeight = view.getHeight();
 
 		ValueAnimator animator = ValueAnimator.ofInt(originalHeight, 0);
-		animator.addListener(new AnimatorListener() {
+		animator.addListener(new AnimatorListenerAdapter() {
 
 			@Override
-			public void onAnimationStart(Animator arg0) {
-			}
-
-			@Override
-			public void onAnimationRepeat(Animator arg0) {
-			}
-
-			@Override
-			public void onAnimationEnd(Animator arg0) {
+			public void onAnimationEnd(Animator animator) {
 				lp.height = 0;
 				view.setLayoutParams(lp);
-			}
-
-			@Override
-			public void onAnimationCancel(Animator arg0) {
 			}
 		});
 
